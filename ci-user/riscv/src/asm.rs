@@ -1,6 +1,5 @@
-use core::arch::asm;
-
 //! Assembly instructions
+
 macro_rules! instruction {
     ($(#[$attr:meta])*, $fnname:ident, $asm:expr, $asm_fn:ident) => (
         $(#[$attr])*
@@ -8,7 +7,7 @@ macro_rules! instruction {
         pub unsafe fn $fnname() {
             match () {
                 #[cfg(all(riscv, feature = "inline-asm"))]
-                () => asm!($asm),
+                () => core::arch::asm!($asm),
 
                 #[cfg(all(riscv, not(feature = "inline-asm")))]
                 () => {
@@ -59,7 +58,7 @@ instruction!(
 pub unsafe fn sfence_vma(asid: usize, addr: usize) {
     match () {
         #[cfg(all(riscv, feature = "inline-asm"))]
-        () => asm!("sfence.vma {0}, {1}", in(reg) asid, in(reg) addr),
+        () => core::arch::asm!("sfence.vma {0}, {1}", in(reg) asid, in(reg) addr),
 
         #[cfg(all(riscv, not(feature = "inline-asm")))]
         () => {
@@ -113,7 +112,7 @@ mod hypervisor_extension {
                     #[cfg(all(riscv, feature = "inline-asm"))]
                     () => {
                         let mut result : usize;
-                        asm!($asm, inlateout("x10") rs1 => result);
+                        core::arch::asm!($asm, inlateout("x10") rs1 => result);
                         return result;
                     }
 
