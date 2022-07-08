@@ -1,5 +1,4 @@
 //! Assembly instructions
-use core::arch;
 macro_rules! instruction {
     ($(#[$attr:meta])*, $fnname:ident, $asm:expr, $asm_fn:ident) => (
         $(#[$attr])*
@@ -87,7 +86,7 @@ mod hypervisor_extension {
                 match () {
                     #[cfg(all(riscv, feature = "inline-asm"))]
                     // Since LLVM does not recognize the two registers, we assume they are placed in a0 and a1, correspondingly.
-                    () => asm!($asm, in("x10") rs1, in("x11") rs2),
+                    () => core::arch::asm!($asm, in("x10") rs1, in("x11") rs2),
 
                     #[cfg(all(riscv, not(feature = "inline-asm")))]
                     () => {
